@@ -59,7 +59,7 @@ h1 a {
   margin-top: 15px;
 }
 
-.twitter-share-button { 
+.twitter-share-button {
   vertical-align: middle;
   margin-top: -7px;
   margin-left: 15px;
@@ -87,7 +87,7 @@ ul {
   line-height: 26px;
 }
 
-.post-title {
+.block--title {
   margin-top: 0;
   /*text-align: center;*/
   font-size: 36px;
