@@ -6,21 +6,6 @@ body {
   color: #333;
 }
 
-a img {
-  border:none;
-}
-
-table {
-  border-collapse: collapse;
-  margin-left: 5px;
-}
-
-table td {
-  border: 1px solid #ccc;
-  padding: 8px;
-  font-size: 16px;
-}
-
 a {
   color: #0088cc;
   text-decoration: none;
@@ -29,44 +14,6 @@ a {
 a:hover {
   text-decoration: underline;
   color: #333;
-}
-
-.describe {
-  font-weight: 600;
-}
-
-h1 a {
-  color: #333;
-}
-
-.pbreak {
-  background-color: #fff;
-  width: 200px;
-  border-bottom: none;
-  margin-top: 50px;
-  margin-bottom: 50px;
-  border-left: none;
-  border-right: none;
-  color: #fff;
-  margin-left: auto;
-  margin-right: auto;
-
-}
-
-.social {
-  text-align: right;
-  height: 20px;
-  margin-top: 15px;
-}
-
-.twitter-share-button {
-  vertical-align: middle;
-  margin-top: -7px;
-  margin-left: 15px;
-}
-
-.logo img {
-  width: 270px;
 }
 
 .logo {
@@ -80,6 +27,11 @@ ul {
   padding: 0px 20px;
 }
 
+.post-description {
+  text-align: center;
+  color: #888;
+}
+
 .header {
   font-size: 18px;
   border-bottom: 1px solid #ccc;
@@ -87,29 +39,18 @@ ul {
   line-height: 26px;
 }
 
-.block--title {
-  margin-top: 0;
-  /*text-align: center;*/
-  font-size: 36px;
-  font-weight: 100;
+h1 {
+  text-decoration: none;
+  color: #333;
+  margin-top: 40px;
 }
 
-.post-description {
-  text-align: center;
-  color: #888;
+h1 a {
+  color: #333;
 }
 
-.header ul {
-  margin: 0;
-}
-
-.header li {
-  display: inline;
-  margin-left: 20px;
-}
-
-.header li a {
-  padding: 5px 15px;
+h1 a:hover {
+  text-decoration: none;
 }
 
 .page-content {
@@ -122,34 +63,8 @@ ul {
   line-height: 36px;
 }
 
-h1, h2, h3, h4{
-  text-decoration: none;
-  color: #333;
-  margin-top: 40px;
-}
-
-h1 a:hover, h2 a:hover, h3 a:hover, h4 a:hover,  {
-  text-decoration: none;
-}
-
-h1 :target , h2 :target, h3 :target, h4 :target {
-  background-color: #92CCA6;
-  padding: 15px;
-}
-
 li {
   margin-left: 28px;
-}
-
-.feed {
-  width: 651px;
-  font-size: 12px;
-  margin: 25px auto 25px auto;
-}
-
-.active {
-  background-color: #ddd;
-  border-radius: 16px;
 }
 
 .pull-right {
