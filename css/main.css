@@ -1,4 +1,3 @@
-
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-weight: 200;
@@ -21,10 +20,6 @@ a:hover {
   margin-bottom: 15px;
   background: none;
   text-align: center;
-}
-
-ul {
-  padding: 0px 20px;
 }
 
 .post-description {
@@ -53,6 +48,11 @@ h1 a:hover {
   text-decoration: none;
 }
 
+h2 {
+  font-weight: 300;
+  margin-top: 40px;
+}
+
 .page-content {
   margin: auto;
   padding-left: 10px;
@@ -60,29 +60,48 @@ h1 a:hover {
   font-weight: 200;
   margin-right: auto;
   margin-bottom: 120px;
-  max-width: 959px;
+  max-width: 700px;
   font-size: 20px;
   line-height: 36px;
 }
 
-li {
-  margin-left: 28px;
+.blog-posts {
+  margin-top: 20px;
 }
 
-.pull-right {
-  float: right;
+.post-list {
+  list-style: none;
+  padding: 0;
 }
 
-.indent-paragraph {
-  margin-top: 40px;
-  margin-left: 10px;
-  margin-right: 10px;
+.post-list li {
+  margin-left: 0;
   margin-bottom: 10px;
 }
 
-/* Mobile Landscape Size and bigger */
+.post-date {
+  color: #888;
+  font-size: 16px;
+  margin-right: 10px;
+}
+
+article {
+  margin-top: 20px;
+}
+
+article p {
+  margin-bottom: 20px;
+}
+
+.footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #ccc;
+  font-size: 16px;
+}
+
 @media only screen and (min-width: 480px) {
-  .indent-paragraph {
+  .about {
     margin-left: 40px;
     margin-right: 40px;
   }
