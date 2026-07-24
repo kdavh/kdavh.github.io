@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Timer - Kellen Hart</title>
+<style>
+  :root{
+    --bg-1:#dde2e5;
+    --bg-2:#eef1f2;
+    --case-1:#f7f7f6;
+    --case-2:#cbcbc8;
+    --face:#ffffff;
+    --red:#e8432b;
+    --red-dark:#c22f1c;
+    --ink:#262524;
+    --ink-soft:#83807a;
+    --focus:#2f6fed;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    background:radial-gradient(circle at 30% 15%, var(--bg-2), var(--bg-1));
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    color:var(--ink);
+  }
+  .app{
+    width:100%;
+    max-width:420px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:22px;
+  }
+  .home-link{
+    font-size:.9rem;
+    color:var(--ink-soft);
+    text-decoration:none;
+  }
+  .home-link:hover{ text-decoration:underline; color:var(--ink); }
+  .timer-case{
+    width:min(78vw,360px);
+    aspect-ratio:1/1;
+    border-radius:50%;
+    background:linear-gradient(150deg,var(--case-1),var(--case-2));
+    box-shadow:
+      0 18px 40px -14px rgba(30,30,28,.4),
+      inset 0 2px 4px rgba(255,255,255,.7),
+      inset 0 -6px 10px rgba(0,0,0,.15);
+    padding:16px;
+    position:relative;
+  }
+  .timer-case.finished{ animation:pulseGlow .6s ease-in-out 6; }
+  @keyframes pulseGlow{
+    0%,100%{ box-shadow:0 18px 40px -14px rgba(30,30,28,.4), inset 0 2px 4px rgba(255,255,255,.7), inset 0 -6px 10px rgba(0,0,0,.15); }
+    50%{ box-shadow:0 0 0 14px rgba(232,67,43,.35), 0 18px 40px -14px rgba(30,30,28,.4), inset 0 2px 4px rgba(255,255,255,.7), inset 0 -6px 10px rgba(0,0,0,.15); }
+  }
+  svg#dial{
+    width:100%;
+    height:100%;
+    display:block;
+    touch-action:none;
+    cursor:grab;
+    border-radius:50%;
+  }
+  svg#dial:active{ cursor:grabbing; }
+  svg#dial:focus-visible{ outline:3px solid var(--focus); outline-offset:5px; }
+  .tick-minor{ stroke:var(--ink-soft); stroke-width:1.5; }
+  .tick-major{ stroke:var(--ink); stroke-width:2.5; }
+  .tick-label{ fill:var(--ink); font-weight:700; user-select:none; }
+  .display{
+    font-family:ui-monospace,"SF Mono","Cascadia Code",Consolas,monospace;
+    font-size:clamp(2.1rem,8vw,2.9rem);
+    font-weight:600;
+    letter-spacing:.02em;
+    font-variant-numeric:tabular-nums;
+  }
+  .hint{
+    margin-top:-10px;
+    font-size:.85rem;
+    color:var(--ink-soft);
+    text-align:center;
+    transition:opacity .4s ease;
+  }
+  .hint.hidden{ opacity:0; }
+  .controls{ display:flex; gap:14px; flex-wrap:wrap; justify-content:center; }
+  .btn{
+    border:none;
+    border-radius:999px;
+    font-size:1.05rem;
+    font-weight:600;
+    font-family:inherit;
+    padding:16px 32px;
+    min-height:56px;
+    min-width:130px;
+    cursor:pointer;
+    transition:transform .15s ease, box-shadow .15s ease, background .2s ease;
+  }
+  .btn:active{ transform:scale(.96); }
+  .btn.primary{ background:var(--red); color:#fff; box-shadow:0 8px 18px -6px rgba(232,67,43,.6); }
+  .btn.primary.running{ background:#4c4a46; box-shadow:0 8px 18px -6px rgba(0,0,0,.4); }
+  .btn.primary:disabled{ opacity:.4; cursor:not-allowed; box-shadow:none; }
+  .btn.secondary{ background:transparent; color:var(--ink); border:2px solid var(--ink-soft); padding:14px 28px; }
+  .btn:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+</style>
+</head>
+<body>
+  <div class="app">
+    <a class="home-link" href="/">&larr; kellenhart.com</a>
+    <div class="timer-case" id="timerCase">
+      <svg id="dial" viewBox="0 0 400 400" tabindex="0" role="slider"
+           aria-label="Timer duration in minutes" aria-valuemin="0" aria-valuemax="60" aria-valuenow="10">
+        <defs>
+          <radialGradient id="faceGrad" cx="50%" cy="45%" r="65%">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="100%" stop-color="#f2f2f0"/>
+          </radialGradient>
+          <linearGradient id="redGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#ef5a3f"/>
+            <stop offset="100%" stop-color="#d6371f"/>
+          </linearGradient>
+        </defs>
+        <circle cx="200" cy="200" r="195" fill="url(#faceGrad)"/>
+        <path id="wedge" fill="url(#redGrad)"/>
+        <circle cx="200" cy="200" r="153" fill="none" stroke="#dcdcda" stroke-width="1"/>
+        <g id="ticksGroup"></g>
+        <circle cx="200" cy="200" r="7" fill="var(--ink)"/>
+      </svg>
+    </div>
+    <div class="display" id="display" role="timer" aria-live="off">10:00</div>
+    <div class="hint" id="hint">Drag the dial (or use arrow keys) to set time</div>
+    <div class="controls">
+      <button class="btn secondary" id="resetBtn" type="button">Reset</button>
+      <button class="btn primary" id="startBtn" type="button">Start</button>
+    </div>
+  </div>
+
+<script>
+(function(){
+  const CX=200, CY=200, MAX_MIN=60, WEDGE_R=152;
+  const svg=document.getElementById('dial');
+  const wedge=document.getElementById('wedge');
+  const ticksGroup=document.getElementById('ticksGroup');
+  const display=document.getElementById('display');
+  const hint=document.getElementById('hint');
+  const startBtn=document.getElementById('startBtn');
+  const resetBtn=document.getElementById('resetBtn');
+  const timerCase=document.getElementById('timerCase');
+
+  let remainingMs=10*60*1000;
+  let lastSetMs=remainingMs;
+  let running=false;
+  let rafId=null;
+  let lastFrame=0;
+  let lastDisplayedSecs=null;
+  let dragging=false;
+  let wakeLock=null;
+
+  async function requestWakeLock(){
+    if(!('wakeLock' in navigator)) return;
+    try{
+      wakeLock=await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release', ()=>{ wakeLock=null; });
+    }catch(e){ wakeLock=null; }
+  }
+  async function releaseWakeLock(){
+    if(wakeLock){ try{ await wakeLock.release(); }catch(e){} wakeLock=null; }
+  }
+  document.addEventListener('visibilitychange', ()=>{
+    if(running && document.visibilityState==='visible' && !wakeLock) requestWakeLock();
+  });
+
+  function pointAt(deg,r){
+    const rad=deg*Math.PI/180;
+    return {x:CX+r*Math.sin(rad), y:CY-r*Math.cos(rad)};
+  }
+
+  function buildTicks(){
+    const frag=document.createDocumentFragment();
+    for(let m=1;m<=60;m++){
+      const deg=m*6;
+      const isMajor=m%5===0;
+      const outer=pointAt(deg,188);
+      const inner=pointAt(deg,isMajor?170:179);
+      const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+      line.setAttribute('x1',inner.x); line.setAttribute('y1',inner.y);
+      line.setAttribute('x2',outer.x); line.setAttribute('y2',outer.y);
+      line.setAttribute('class',isMajor?'tick-major':'tick-minor');
+      frag.appendChild(line);
+      if(isMajor){
+        const lp=pointAt(deg,159);
+        const text=document.createElementNS('http://www.w3.org/2000/svg','text');
+        text.setAttribute('x',lp.x); text.setAttribute('y',lp.y);
+        text.setAttribute('class','tick-label');
+        text.setAttribute('text-anchor','middle');
+        text.setAttribute('dominant-baseline','central');
+        text.setAttribute('font-size','20');
+        text.textContent=m;
+        frag.appendChild(text);
+      }
+    }
+    ticksGroup.appendChild(frag);
+  }
+
+  function describeWedge(sweepDeg){
+    if(sweepDeg<=0.0001) return '';
+    if(sweepDeg>=359.999){
+      const top=pointAt(0,WEDGE_R), bottom=pointAt(180,WEDGE_R);
+      return `M ${top.x} ${top.y} A ${WEDGE_R} ${WEDGE_R} 0 1 1 ${bottom.x} ${bottom.y} A ${WEDGE_R} ${WEDGE_R} 0 1 1 ${top.x} ${top.y} Z`;
+    }
+    const start=pointAt(0,WEDGE_R);
+    const end=pointAt(sweepDeg,WEDGE_R);
+    const largeArc=sweepDeg>180?1:0;
+    return `M ${CX} ${CY} L ${start.x} ${start.y} A ${WEDGE_R} ${WEDGE_R} 0 ${largeArc} 1 ${end.x} ${end.y} Z`;
+  }
+
+  function formatTime(totalSecs){
+    const m=Math.floor(totalSecs/60), s=totalSecs%60;
+    return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  }
+
+  function render(force){
+    const secs=Math.ceil(remainingMs/1000);
+    if(force || secs!==lastDisplayedSecs){
+      display.textContent=formatTime(secs);
+      lastDisplayedSecs=secs;
+    }
+    const fraction=remainingMs/(MAX_MIN*60000);
+    wedge.setAttribute('d', describeWedge(Math.max(0,Math.min(360,fraction*360))));
+    svg.setAttribute('aria-valuenow', Math.round(remainingMs/60000));
+  }
+
+  function setMinutesFromEvent(e){
+    const rect=svg.getBoundingClientRect();
+    const scale=400/rect.width;
+    const x=(e.clientX-rect.left)*scale;
+    const y=(e.clientY-rect.top)*scale;
+    const dx=x-CX, dy=y-CY;
+    let deg=Math.atan2(dx,-dy)*180/Math.PI;
+    if(deg<0) deg+=360;
+    let minutes=Math.round(deg/6);
+    minutes=Math.max(0,Math.min(60,minutes));
+    remainingMs=minutes*60000;
+    lastSetMs=remainingMs;
+    render();
+  }
+
+  function stopAlarmVisual(){ timerCase.classList.remove('finished'); }
+
+  function updateStartBtn(){
+    startBtn.textContent=running?'Pause':'Start';
+    startBtn.classList.toggle('running',running);
+    startBtn.disabled=!running && remainingMs<=0;
+  }
+
+  function startTimer(){
+    if(remainingMs<=0) return;
+    running=true;
+    lastFrame=performance.now();
+    rafId=requestAnimationFrame(loop);
+    updateStartBtn();
+    requestWakeLock();
+  }
+
+  function loop(now){
+    const dt=now-lastFrame;
+    lastFrame=now;
+    remainingMs-=dt;
+    if(remainingMs<=0){
+      remainingMs=0;
+      render(true);
+      finish();
+      return;
+    }
+    render();
+    rafId=requestAnimationFrame(loop);
+  }
+
+  function pauseTimer(){
+    running=false;
+    if(rafId) cancelAnimationFrame(rafId);
+    updateStartBtn();
+    releaseWakeLock();
+  }
+
+  function finish(){
+    running=false;
+    updateStartBtn();
+    beep();
+    timerCase.classList.add('finished');
+    if(navigator.vibrate){ try{ navigator.vibrate([200,100,200,100,200]); }catch(e){} }
+    releaseWakeLock();
+  }
+
+  function beep(){
+    try{
+      const ctx=new (window.AudioContext||window.webkitAudioContext)();
+      const now=ctx.currentTime;
+      for(let i=0;i<3;i++){
+        const osc=ctx.createOscillator();
+        const gain=ctx.createGain();
+        osc.type='sine';
+        osc.frequency.value=880;
+        gain.gain.setValueAtTime(0.0001, now+i*0.35);
+        gain.gain.exponentialRampToValueAtTime(0.3, now+i*0.35+0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now+i*0.35+0.28);
+        osc.connect(gain).connect(ctx.destination);
+        osc.start(now+i*0.35);
+        osc.stop(now+i*0.35+0.3);
+      }
+    }catch(e){}
+  }
+
+  svg.addEventListener('pointerdown',(e)=>{
+    e.preventDefault();
+    if(running) pauseTimer();
+    stopAlarmVisual();
+    dragging=true;
+    svg.setPointerCapture(e.pointerId);
+    hint.classList.add('hidden');
+    setMinutesFromEvent(e);
+  });
+  svg.addEventListener('pointermove',(e)=>{ if(dragging) setMinutesFromEvent(e); });
+  svg.addEventListener('pointerup',()=>{ dragging=false; });
+  svg.addEventListener('pointercancel',()=>{ dragging=false; });
+
+  svg.addEventListener('keydown',(e)=>{
+    if(running) return;
+    let minutes=Math.round(remainingMs/60000);
+    if(e.key==='ArrowUp'||e.key==='ArrowRight'){ minutes=Math.min(60,minutes+1); }
+    else if(e.key==='ArrowDown'||e.key==='ArrowLeft'){ minutes=Math.max(0,minutes-1); }
+    else return;
+    e.preventDefault();
+    remainingMs=minutes*60000;
+    lastSetMs=remainingMs;
+    hint.classList.add('hidden');
+    render(true);
+  });
+
+  startBtn.addEventListener('click',()=>{
+    stopAlarmVisual();
+    if(running) pauseTimer(); else startTimer();
+  });
+  resetBtn.addEventListener('click',()=>{
+    pauseTimer();
+    stopAlarmVisual();
+    remainingMs=lastSetMs;
+    render(true);
+  });
+  timerCase.addEventListener('animationend',()=>{ timerCase.classList.remove('finished'); });
+
+  buildTicks();
+  render(true);
+  updateStartBtn();
+})();
+</script>
+</body>
+</html>
