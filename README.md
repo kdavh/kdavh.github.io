@@ -14,6 +14,7 @@ Opens at [http://localhost:8000](http://localhost:8000).
 
 ```
 index.html              # Homepage with bio and blog listing
+privacy/                # Privacy policy
 blog/                   # Blog posts (each post is a directory with index.html)
 css/main.css            # Styles
 CNAME                   # Custom domain config
